@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
@@ -18,13 +19,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 public class StringConverter {
 
-	private static java.util.Locale locale = null;
+	private static Locale locale = null;
 
 	public StringConverter(String localeLanguage) {
 		if (localeLanguage == null) {
 			localeLanguage = "en";
 		}
-		locale = new java.util.Locale(localeLanguage);
+		locale = new Locale(localeLanguage);
 	}
 
 	public static String toUpperCase(String string) {
