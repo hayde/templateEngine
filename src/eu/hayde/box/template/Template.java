@@ -197,7 +197,7 @@ public class Template {
 
 		// now add the functions!
 		try {
-			interpreter.set("String", new StringConverter());
+			interpreter.set("String", new StringConverter(this.language));
 		} catch (EvalError ex) {
 			throw new XMLException("Was not able to set functions to interpreter.");
 		}

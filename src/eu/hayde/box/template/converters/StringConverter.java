@@ -10,8 +10,6 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
@@ -19,6 +17,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * @author can.senturk
  */
 public class StringConverter {
+
+	private static java.util.Locale locale = null;
+
+	public StringConverter(String localeLanguage) {
+		if (localeLanguage == null) {
+			localeLanguage = "en";
+		}
+		locale = new java.util.Locale(localeLanguage);
+	}
 
 	public static String toUpperCase(String string) {
 		return string.toUpperCase();
@@ -115,7 +122,7 @@ public class StringConverter {
 	 * @return the String in format "yyyy-MM-dd HH:mm:ss"
 	 */
 	public static String DateToString(Date date) {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", locale).format(date);
 	}
 
 	/**
@@ -129,15 +136,15 @@ public class StringConverter {
 		Date returnValue = null;
 		try {
 			if (dateString.matches("[0-9]{2,4}-[0-9]{1,2}-[0-9]{1,2}\\s+[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}")) {
-				returnValue = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS").parse(dateString);
+				returnValue = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS", locale).parse(dateString);
 			} else if (dateString.matches("[0-9]{2,4}-[0-9]{1,2}-[0-9]{1,2}\\s+[0-9]{1,2}:[0-9]{1,2}")) {
-				returnValue = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateString);
+				returnValue = new SimpleDateFormat("yyyy-MM-dd HH:mm", locale).parse(dateString);
 			} else if (dateString.matches("[0-9]{2,4}-[0-9]{1,2}-[0-9]{1,2}\\s*")) {
-				returnValue = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
+				returnValue = new SimpleDateFormat("yyyy-MM-dd", locale).parse(dateString);
 			} else if (dateString.matches("[0-9]{8}\\s*")) {
-				returnValue = new SimpleDateFormat("yyyyMMdd").parse(dateString);
+				returnValue = new SimpleDateFormat("yyyyMMdd", locale).parse(dateString);
 			} else if (dateString.matches("[0-9]{1,2}\\.[0-9]{1,2}\\.[0-9]{2,4}\\s*")) {
-				returnValue = new SimpleDateFormat("dd.MM.yyyy").parse(dateString);
+				returnValue = new SimpleDateFormat("dd.MM.yyyy", locale).parse(dateString);
 			}
 		} catch (ParseException ex) {
 		}
@@ -149,7 +156,7 @@ public class StringConverter {
 	}
 
 	public static String DateToString(Date date, String format) {
-		return new SimpleDateFormat(format).format(date);
+		return new SimpleDateFormat(format, locale).format(date);
 	}
 
 	public static String DateToString(XMLGregorianCalendar date, String format) {
