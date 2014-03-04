@@ -7,32 +7,32 @@ package eu.hayde.box.template;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
-import eu.hayde.box.template.xml.XMLTagger;
-import eu.hayde.box.template.xml.XMLException;
-import eu.hayde.box.template.xml.Element;
+import eu.hayde.box.template.converters.StringConverter;
 import eu.hayde.box.template.xml.Attribute;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 import eu.hayde.box.template.xml.Command;
 import eu.hayde.box.template.xml.DocumentationDictionary;
-import eu.hayde.box.template.converters.StringConverter;
+import eu.hayde.box.template.xml.Element;
+import eu.hayde.box.template.xml.XMLException;
+import eu.hayde.box.template.xml.XMLTagger;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -76,16 +76,16 @@ public class Template {
 	 * <br/>
 	 * (translation enabled)
 	 *
-	 * @param baseDir the base directory. If it is empty of null, it will strip
-	 * the baseDir from the filename. <br/>
-	 * each request for a folder below this folder or on another device will be
-	 * rejected. this is to disable hacking attacks from the template
+	 * @param baseDir the base directory. If it is empty of null, it will
+	 * strip the baseDir from the filename. <br/>
+	 * each request for a folder below this folder or on another device will
+	 * be rejected. this is to disable hacking attacks from the template
 	 * engine.<br>
 	 * <br/>
-	 * Important: if you have a multilingual template, this folder will contain
-	 * the translation files for your system.
-	 * @param templateFileName the filename of the template, which can contain
-	 * some further folder information too.
+	 * Important: if you have a multilingual template, this folder will
+	 * contain the translation files for your system.
+	 * @param templateFileName the filename of the template, which can
+	 * contain some further folder information too.
 	 */
 	public Template(String baseDir, String templateFileName) {
 		this.baseDir = baseDir;
@@ -93,14 +93,14 @@ public class Template {
 		this.language = "en";
 		this.recursionFlag = false;
 		if (baseDir == null
-				|| "".equals(baseDir)) {
+			|| "".equals(baseDir)) {
 			_stripBaseDirFromFile();
 		}
 	}
 
 	/**
-	 * instead of using a file template, you can initialize the template engine
-	 * with a given content.<br/>
+	 * instead of using a file template, you can initialize the template
+	 * engine with a given content.<br/>
 	 * <br/>
 	 * (translation disabled)
 	 * <br/>
@@ -132,8 +132,8 @@ public class Template {
 	}
 
 	/**
-	 * set the base directory. this will enable or disable the translation, if
-	 * the value of the base directory is valid.<br/>
+	 * set the base directory. this will enable or disable the translation,
+	 * if the value of the base directory is valid.<br/>
 	 * <br/>
 	 * (translation enabled)
 	 *
@@ -142,8 +142,8 @@ public class Template {
 	public void setBaseDir(String baseDir) {
 		this.baseDir = baseDir;
 		if (this.baseDir != null
-				&& this.baseDir.length() > 0
-				&& this.language == null) {
+			&& this.baseDir.length() > 0
+			&& this.language == null) {
 			this.language = "en";
 		}
 	}
@@ -204,8 +204,8 @@ public class Template {
 
 		// load the translation files
 		if (this.language != null
-				&& this.language.length() > 0
-				&& this.recursionFlag == false) {
+			&& this.language.length() > 0
+			&& this.recursionFlag == false) {
 
 			// load the language file
 			_loadLanguageFile();
@@ -407,9 +407,9 @@ public class Template {
 					 * hidden, if empty
 					 */
 					if (newAttribute.name.endsWith("[noval]")
-							&& (newAttribute.value == null
-							|| newAttribute.value.equals(""))
-							|| newAttribute.value.equals("false")) {
+						&& (newAttribute.value == null
+						|| newAttribute.value.equals(""))
+						|| newAttribute.value.equals("false")) {
 						/*
 						 * no value, so don't add this attribute
 						 */
@@ -539,11 +539,11 @@ public class Template {
 		try {
 			urlConn = url.openConnection();
 			if (urlConn != null) {
-				urlConn.setReadTimeout(60 * 1000);
+				urlConn.setReadTimeout(10 * 1000);
 			}
 			if (urlConn != null && urlConn.getInputStream() != null) {
 				in = new InputStreamReader(urlConn.getInputStream(),
-						Charset.defaultCharset());
+					Charset.defaultCharset());
 				BufferedReader bufferedReader = new BufferedReader(in);
 				int cp;
 				while ((cp = bufferedReader.read()) != -1) {
@@ -555,7 +555,7 @@ public class Template {
 				in.close();
 			}
 		} catch (IOException ex) {
-			throw new TemplateException("Unable to load template of URL '" + filename + "'!");
+			throw new TemplateException("Unable to load template of URL '" + filename + "'! System message: '" + ex.getMessage() + "'");
 		}
 
 		return sb.toString();
@@ -623,7 +623,7 @@ public class Template {
 		try {
 			marker = 1;	// before baseURL
 			if (directory != null
-					&& !"".equals(directory)) {
+				&& !"".equals(directory)) {
 				baseURL = new URL(directory);
 			}
 			marker = 2; // at file URL
@@ -637,19 +637,19 @@ public class Template {
 			} else {
 				marker = 3; // before if
 				if (fileURL.toURI().normalize().toString().startsWith(
-						baseURL.toURI().normalize().toString())) {
+					baseURL.toURI().normalize().toString())) {
 					matchesToBase = true;
 				}
 			}
 		} catch (URISyntaxException ex) {
-			throw new TemplateException("Not able to convert URL to URI for file '" + filename + "'.");
+			throw new TemplateException("Not able to convert URL to URI for file '" + filename + "'. System error: '" + ex.getMessage() + "'");
 		} catch (MalformedURLException ex) {
 			if (marker == 1) {
-				throw new TemplateException("Malformed Base URL for file '" + directory + "'.");
+				throw new TemplateException("Malformed Base URL for file '" + directory + "'. System error: '" + ex.getMessage() + "'");
 			} else if (marker == 2) {
-				throw new TemplateException("Malformed URL for file '" + filename + "'.");
+				throw new TemplateException("Malformed URL for file '" + filename + "'. System error: '" + ex.getMessage() + "'");
 			} else if (marker == 3) {
-				throw new TemplateException("URI Exception for file '" + filename + "'.");
+				throw new TemplateException("URI Exception for file '" + filename + "'. System error: '" + ex.getMessage() + "'");
 			}
 		}
 		if (matchesToBase) {
@@ -666,9 +666,9 @@ public class Template {
 	}
 
 	/**
-	 * does load from a property file the value for the given key. if there is
-	 * no value for this key, it will give back the default value and create a
-	 * new entry to the property file, to translate.
+	 * does load from a property file the value for the given key. if there
+	 * is no value for this key, it will give back the default value and
+	 * create a new entry to the property file, to translate.
 	 *
 	 * @param key
 	 * @param defaultValue
@@ -728,7 +728,7 @@ public class Template {
 
 	private void _saveLanguageFile() throws TemplateException {
 		if (languageFile != null
-				&& this.recursionFlag == false) {
+			&& this.recursionFlag == false) {
 			OutputStream os;
 			try {
 				File yourFile = __urlToFile(new URL(languageFilename));
