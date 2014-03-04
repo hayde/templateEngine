@@ -200,23 +200,27 @@ public class StringConverter {
 	public static String Left(String val, Integer endIndex) {
 		return val.substring(0, endIndex);
 	}
+    public static String LeftSmooth(String val, Integer endIndex) {
+        String returnValue = "";
+        if (endIndex > val.length()) {
+            returnValue = val;
+        } else {
+            returnValue  = val.substring(0, endIndex);
+            for (int i = endIndex; i < val.length(); i++) {
+                char currentChar = val.charAt(i);
+                if (currentChar == '.'
+                        || currentChar == ' '
+                        || currentChar == ','
+                        || currentChar == ';'
+                        || currentChar == '('
+                        || currentChar == ')') {
+                    // quit it here
+                    i = val.length();
+                }
+                returnValue += currentChar;
+            }
+        }
 
-	public static String LeftSmooth(String val, Integer endIndex) {
-		String returnValue = "";
-		returnValue = val.substring(0, endIndex);
-		for (int i = endIndex; i < val.length(); i++) {
-			char currentChar = val.charAt(i);
-			if (currentChar == '.'
-					|| currentChar == ' '
-					|| currentChar == ','
-					|| currentChar == ';'
-					|| currentChar == '('
-					|| currentChar == ')') {
-				// quit it here
-				i = val.length();
-			}
-			returnValue += currentChar;
-		}
-		return returnValue;
-	}
+        return returnValue;
+    }
 }
