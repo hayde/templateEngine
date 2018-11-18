@@ -173,3 +173,53 @@ rendered:
 
 ```
 
+### hyd:repeat
+this allows you to place any object into an ArrayList, to repeat this content 
+inside a block.
+
+We will use in our example a HashMap, but you can use a class directly.
+
+```
+HashMap one = new HashMap();
+one.put( "name", "Ahmet" );
+one.put( "lastname", "Hashim" );
+one.put( "profession", "poet" );
+HashMap two = new HashMap();
+two.put( "name", "Sun");
+two.put( "lastname", "Tzu");
+two.put( "profession", "mathematician");
+ArrayList items = new ArrayList();
+items.add( one );
+items.add( two );
+
+template.add( "names", items );
+```
+
+Template:
+
+```
+<span hyd:repeat="name : names">
+    <span hyd:content="name.name">here the name</span>
+    <span hyd:content="name.lastname">here the lastname</span>
+    <span hyd:content="name.profession">here the profession</span>
+</span>
+```
+
+rendered:
+```
+<span>
+    <span>Ahmet</span>
+    <span>Hashim</span>
+    <span>poet</span>
+</span>
+<span>
+    <span>Sun</span>
+    <span>Tzu</span>
+    <span>mathematician</span>
+</span>
+```
+
+There is more, but for today, this enough :)
+
+Next to come:
+Translate & Command
