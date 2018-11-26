@@ -49,9 +49,9 @@ import java.util.logging.Logger;
 public class Template {
 
 	private final static String HAYDE_NAMESPACEPREFIX = "hyd";
-	private final static String HAYDE_INCLUDE = "include";
-	private final static String HAYDE_CONTENT = "content";
-	private final static String HAYDE_REPLACE = "replace";
+	private final static String HAYDE_INCLUDE = "include"; //
+	private final static String HAYDE_CONTENT = "content"; //
+	private final static String HAYDE_REPLACE = "replace"; //
 	private final static String HAYDE_REPEAT = "repeat";
 	private final static String HAYDE_CONDITION = "condition";
 	private final static String HAYDE_COMMAND = "command";
@@ -163,7 +163,7 @@ public class Template {
 	}
 
 	/**
-	 * return the curren valid language Code
+	 * return the current valid language Code
 	 *
 	 * @return String, default = "en"
 	 */
@@ -219,18 +219,38 @@ public class Template {
 		}
 	}
 
+	/**
+	 * xml structure of the dictionary
+	 * 
+	 * @return string
+	 * @throws XMLException 
+	 */
 	public String getXML() throws XMLException {
 		DocumentationDictionary dd = new DocumentationDictionary("Dictionary", dictionary);
 
 		return dd.toXML();
 	}
 
+	/**
+	 * json structure of the dictionary
+	 * 
+	 * @return json string 
+	 * @throws XMLException 
+	 */
 	public String getJSON() throws XMLException {
 		DocumentationDictionary dd = new DocumentationDictionary("Dictionary", dictionary);
 
 		return dd.toJSON();
 	}
 
+	/**
+	 * main function call to process the template with all the keys to be replaced
+	 * 
+	 * @return	amount of actions, required to process the template
+	 * 
+	 * @throws TemplateException
+	 * @throws XMLException 
+	 */
 	public int process() throws TemplateException, XMLException {
 		int actionCount = 0;
 		if (!preprocessed) {
@@ -282,6 +302,10 @@ public class Template {
 		return actionCount;
 	}
 
+	/**
+	 * the content of the 
+	 * @return 
+	 */
 	public String getContent() {
 		return this.tagger.toString();
 	}
