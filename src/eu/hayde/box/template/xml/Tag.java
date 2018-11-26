@@ -39,7 +39,7 @@ public class Tag {
 		 * group 3: Everything up to the second appearance of the 'group 2'
 		 *          quote.
 		 */
-		Pattern pattern = Pattern.compile("(" + name + ")\\s*=\\s*(['\\\"])(.*?)\\2", Pattern.CASE_INSENSITIVE);
+		Pattern pattern = Pattern.compile("(" + name + ")\\s*=\\s*\\\"([^\\\"]*)\\\"", Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
 		Matcher matcher = pattern.matcher(tag);
 
 		if (matcher.find()) {
@@ -48,7 +48,7 @@ public class Tag {
 			if (matcher.groupCount() < 2) {
 				throw new XMLException("Couldn't get the value for attribute '" + name + "' from Tag " + tag + " at starting at position " + start);
 			}
-			returnValue.value = matcher.group(3);
+			returnValue.value = matcher.group(2);
 		}
 
 		return returnValue;
@@ -60,7 +60,7 @@ public class Tag {
 	}
 
 	public String removeAttribute(Attribute attribute) {
-		tag = tag.replaceAll("\\s*" + attribute.name + "\\s*=\\s*(['\\\"])(.*?)\\1", "");
+		tag = tag.replaceAll("\\s*" + attribute.name + "\\s*=\\s*\\\"[^\\\"]*\\\"", "");
 		return tag;
 	}
 

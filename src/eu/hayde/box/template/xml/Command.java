@@ -4,8 +4,6 @@
  */
 package eu.hayde.box.template.xml;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,6 +15,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 /**
  *
@@ -30,12 +31,14 @@ public class Command {
 	public String encoding;
 	public String condition;
 	public String codeString;
-	public Interpreter interpreter;
+	public ScriptEngine interpreter;
 	public Properties languageFile;
 	private Map<String, Object> dictionary;
+	private Bindings binding;
 
-	public Command(Interpreter interpreter, Map<String, Object> dictionary, Properties languageFile, String code) {
+	public Command(ScriptEngine interpreter, Bindings binding, Map<String, Object> dictionary, Properties languageFile, String code) {
 		this.interpreter = interpreter;
+		this.binding = binding;
 		this.dictionary = dictionary;
 		this.languageFile = languageFile;
 		Pattern declarationPattern = Pattern.compile("^\\s*([a-zA-Z0-9_]+)\\s*\\:");
@@ -73,8 +76,8 @@ public class Command {
 //			return _getDictionaryValue(codeString);
 //		} else {
 		try {
-			return interpreter.eval(codeString);
-		} catch (EvalError ex) {
+			return interpreter.eval(codeString, binding);
+		} catch (ScriptException ex) {
 			throw new XMLException("Unable to process code of '" + codeString + "': " + ex.getMessage());
 		}
 //		}
@@ -85,12 +88,12 @@ public class Command {
 
 		// check, if the element is existing
 		Object obj = run();
-		String returnValue = "";
+		StringBuilder returnValue = new StringBuilder();
+		//String returnValue = "";
 
 		// check if null
 		if (obj == null) {
 			// no element, so return nothing
-			returnValue = "";
 		} else {
 
 			List elements = null;
@@ -125,12 +128,12 @@ public class Command {
 					tmpTemplate.addObject(declaration, singleItem);
 					tmpTemplate.addObject("counter", i);
 					tmpTemplate.process();
-					returnValue += tmpTemplate.getContent();
+					returnValue.append( tmpTemplate.getContent() );
 				}
 			}
 
 		}
-		return returnValue;
+		return returnValue.toString();
 	}
 
 	private Object _getDictionaryValue(String codeString) throws XMLException {

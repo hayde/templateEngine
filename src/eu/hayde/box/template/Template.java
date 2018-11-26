@@ -4,9 +4,6 @@
  */
 package eu.hayde.box.template;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.NameSpace;
 import eu.hayde.box.template.converters.StringConverter;
 import eu.hayde.box.template.xml.Attribute;
 import eu.hayde.box.template.xml.Command;
@@ -37,6 +34,9 @@ import java.util.Properties;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 /**
  * this is a complete HTML template engine for java. it is specially designed to
@@ -61,7 +61,7 @@ public class Template {
 	private String baseDir;
 	private String fileName;
 	private String rawContent;
-	private boolean recursionFlag;
+	private boolean recursionFlag;	
 	private String language;
 	private Properties languageFile;
 	private boolean languageChanged;
@@ -69,7 +69,8 @@ public class Template {
 	private XMLTagger tagger;
 	private Map<String, Object> dictionary = new HashMap<String, Object>();
 	private boolean preprocessed = false;
-	private Interpreter interpreter = new Interpreter();
+	private ScriptEngine interpreter;
+	private Bindings binding;
 
 	/**
 	 * initializes the template engine.<br/>
@@ -88,6 +89,8 @@ public class Template {
 	 * contain some further folder information too.
 	 */
 	public Template(String baseDir, String templateFileName) {
+		this.interpreter = new ScriptEngineManager().getEngineByName("nashorn");
+
 		this.baseDir = baseDir;
 		this.fileName = templateFileName;
 		this.language = "en";
@@ -113,6 +116,14 @@ public class Template {
 		this.rawContent = content;
 		this.language = null;
 		this.recursionFlag = false;
+		this.interpreter = new ScriptEngineManager().getEngineByName("nashorn");
+	}
+	
+	public Template(String content, ScriptEngine interpreter) {
+		this.rawContent = content;
+		this.language = null;
+		this.recursionFlag = false;
+		this.interpreter = interpreter;
 	}
 
 	/**
@@ -123,8 +134,8 @@ public class Template {
 	 * @param content
 	 * @param interpreter
 	 */
-	public Template(String content, Interpreter interpreter, Properties languageFile) {
-		this.interpreter.setNameSpace(new NameSpace(interpreter.getNameSpace(), "childRecursion"));
+	public Template(String content, ScriptEngine interpreter, Properties languageFile) {
+		this.interpreter = interpreter;
 		this.rawContent = content;
 		this.language = null;
 		this.languageFile = languageFile;
@@ -180,6 +191,9 @@ public class Template {
 	}
 
 	private void _preprocess() throws XMLException, TemplateException {
+		
+		binding = interpreter.createBindings();
+		
 		if (this.rawContent == null) {
 			if (this.fileName != null) {
 				this.rawContent = _readURL(this.baseDir, this.fileName);
@@ -188,19 +202,11 @@ public class Template {
 		tagger = new XMLTagger(rawContent);
 		// set all interpreter values
 		for (String key : dictionary.keySet()) {
-			try {
-				interpreter.set(key, dictionary.get(key));
-			} catch (EvalError ex) {
-				throw new XMLException("Was not able to set value '" + key + "' to interpreter.");
-			}
+			binding.put(key, dictionary.get(key));
 		}
 
 		// now add the functions!
-		try {
-			interpreter.set("String", new StringConverter(this.language));
-		} catch (EvalError ex) {
-			throw new XMLException("Was not able to set functions to interpreter.");
-		}
+		binding.put("StringConverter", new StringConverter(this.language));
 
 		// load the translation files
 		if (this.language != null
@@ -217,6 +223,7 @@ public class Template {
 		if (this.languageChanged) {
 			_saveLanguageFile();
 		}
+		binding.clear();
 	}
 
 	/**
@@ -587,14 +594,14 @@ public class Template {
 
 	private String _parseCode(String parCode) throws XMLException {
 		// code could be like: class.variablename
-		Command code = new Command(interpreter, dictionary, languageFile, parCode);
+		Command code = new Command(interpreter, binding, dictionary, languageFile, parCode);
 
 		return "" + code.run();
 	}
 
 	private String _parseRepeat(Attribute attribute, Element element) throws XMLException, TemplateException {
 		// code could be like: class.variablename
-		Command code = new Command(interpreter, dictionary, languageFile, attribute.value);
+		Command code = new Command(interpreter, binding, dictionary, languageFile, attribute.value);
 
 		return code.repeat(tagger.getTag(element), this.baseDir);
 	}
@@ -606,14 +613,14 @@ public class Template {
 		Attribute returnValue = new Attribute();
 		returnValue.name = parCode.substring(0, parCode.indexOf(":")).trim();
 		returnValue.value = parCode.substring(parCode.indexOf(":") + 1).trim();
-		Command code = new Command(interpreter, dictionary, languageFile, returnValue.value);
+		Command code = new Command(interpreter, binding, dictionary, languageFile, returnValue.value);
 
 		returnValue.value = "" + code.run();
 		return returnValue;
 	}
 
 	private boolean _parseCondition(String parCode) throws XMLException {
-		Command code = new Command(interpreter, dictionary, languageFile, parCode);
+		Command code = new Command(interpreter, binding, dictionary, languageFile, parCode);
 		boolean returnValue = false;
 		Object result = code.run();
 		if (result instanceof Boolean) {
