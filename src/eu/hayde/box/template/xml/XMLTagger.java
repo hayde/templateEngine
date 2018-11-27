@@ -9,14 +9,15 @@ import java.util.regex.Pattern;
  */
 public class XMLTagger {
 
-	private String xml;
+	private StringBuffer xml;
 
 	public XMLTagger(String xml) {
-		this.xml = xml;
+		this.xml = new StringBuffer(xml);
+		this.xml.ensureCapacity(10000);
 	}
 
 	public String toString() {
-		return xml;
+		return xml.toString();
 	}
 
 	public String getNextTag(String prefix) {
@@ -154,13 +155,15 @@ public class XMLTagger {
 
 	public void replace(Element element, String content) {
 		if (element.isSingleTag()) {
-			xml = xml.substring(0, element.getStartTag().start)
-					+ content
-					+ xml.substring(element.getStartTag().end, xml.length());
+			xml.replace(element.getStartTag().start, element.getStartTag().end, content);
+//			xml = xml.substring(0, element.getStartTag().start)
+//					+ content
+//					+ xml.substring(element.getStartTag().end, xml.length());
 		} else {
-			xml = xml.substring(0, element.getStartTag().start)
-					+ content
-					+ xml.substring(element.getEndTag().end, xml.length());
+//			xml = xml.substring(0, element.getStartTag().start)
+//					+ content
+//					+ xml.substring(element.getEndTag().end, xml.length());
+			xml.replace(element.getStartTag().start, element.getEndTag().end, content);
 		}
 	}
 
@@ -168,9 +171,10 @@ public class XMLTagger {
 		if (element.isSingleTag()) {
 			throw new XMLException("command hyd:content can only put content to a <x></x>; tag. but this is a empty element tag <x />;. only valid with hyd:replace: " + element.getStartTag());
 		} else {
-			xml = xml.substring(0, element.getStartTag().end)
-					+ content
-					+ xml.substring(element.getEndTag().start, xml.length());
+			xml.replace(element.getStartTag().end, element.getEndTag().start, content);
+//			xml = xml.substring(0, element.getStartTag().end)
+//					+ content
+//					+ xml.substring(element.getEndTag().start, xml.length());
 		}
 	}
 
@@ -178,9 +182,10 @@ public class XMLTagger {
 		int beforeSize = element.getStartTag().tag.length();
 		String newStartTag = element.getStartTag().removeAttribute(attribute);
 		int afterSize = element.getStartTag().tag.length();
-		xml = xml.substring(0, element.getStartTag().start)
-				+ newStartTag
-				+ xml.substring(element.getStartTag().end, xml.length());
+		xml.replace(element.getStartTag().start, element.getStartTag().end, newStartTag);
+//		xml = xml.substring(0, element.getStartTag().start)
+//				+ newStartTag
+//				+ xml.substring(element.getStartTag().end, xml.length());
 		element.getStartTag().end -= beforeSize - afterSize;
 		if (element.getEndTag() != null) {
 			element.getEndTag().start -= beforeSize - afterSize;
@@ -200,9 +205,10 @@ public class XMLTagger {
 		int beforeSize = element.getStartTag().tag.length();
 		String newStartTag = element.getStartTag().addAttribute(attribute);
 		int afterSize = element.getStartTag().tag.length();
-		xml = xml.substring(0, element.getStartTag().start)
-				+ newStartTag
-				+ xml.substring(element.getStartTag().end, xml.length());
+		xml.replace(element.getStartTag().start, element.getStartTag().end, newStartTag );
+//		xml = xml.substring(0, element.getStartTag().start)
+//				+ newStartTag
+//				+ xml.substring(element.getStartTag().end, xml.length());
 		element.getStartTag().end -= beforeSize - afterSize;
 		if (element.getEndTag() != null) {
 			element.getEndTag().start -= beforeSize - afterSize;
@@ -212,12 +218,16 @@ public class XMLTagger {
 
 	public void removeTag(Element element) {
 		if (element.getEndTag() != null) {
-			xml = xml.substring(0, element.getStartTag().start)
-					+ xml.substring(element.getStartTag().end, element.getEndTag().start)
-					+ xml.substring(element.getEndTag().end, xml.length());
+			// reverse order to keep the order
+			xml.replace(element.getEndTag().start,element.getEndTag().end, "" );
+			xml.replace(element.getStartTag().start, element.getStartTag().end, "");
+//			xml = xml.substring(0, element.getStartTag().start)
+//					+ xml.substring(element.getStartTag().end, element.getEndTag().start)
+//					+ xml.substring(element.getEndTag().end, xml.length());
 		} else {
-			xml = xml.substring(0, element.getStartTag().start)
-					+ xml.substring(element.getStartTag().end, xml.length());
+			xml.replace(element.getStartTag().start, element.getStartTag().end, "");
+//			xml = xml.substring(0, element.getStartTag().start)
+//					+ xml.substring(element.getStartTag().end, xml.length());
 		}
 	}
 }

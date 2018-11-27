@@ -601,14 +601,14 @@ public class Template {
 
 	private String _parseCode(String parCode) throws XMLException {
 		// code could be like: class.variablename
-		Command code = new Command(interpreter, dictionary, languageFile, parCode);
+		Command code = new Command(interpreter, languageFile, parCode);
 
 		return "" + code.run();
 	}
 
 	private String _parseRepeat(Attribute attribute, Element element) throws XMLException, TemplateException {
 		// code could be like: class.variablename
-		Command code = new Command(interpreter, dictionary, languageFile, attribute.value);
+		Command code = new Command(interpreter, languageFile, attribute.value);
 
 		return code.repeat(tagger.getTag(element), this.baseDir);
 	}
@@ -620,14 +620,14 @@ public class Template {
 		Attribute returnValue = new Attribute();
 		returnValue.name = parCode.substring(0, parCode.indexOf(":")).trim();
 		returnValue.value = parCode.substring(parCode.indexOf(":") + 1).trim();
-		Command code = new Command(interpreter, dictionary, languageFile, returnValue.value);
+		Command code = new Command(interpreter, languageFile, returnValue.value);
 
 		returnValue.value = "" + code.run();
 		return returnValue;
 	}
 
 	private boolean _parseCondition(String parCode) throws XMLException {
-		Command code = new Command(interpreter, dictionary, languageFile, parCode);
+		Command code = new Command(interpreter, languageFile, parCode);
 		boolean returnValue = false;
 		Object result = code.run();
 		if (result instanceof Boolean) {
