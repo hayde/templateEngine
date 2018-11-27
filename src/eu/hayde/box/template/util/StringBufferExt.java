@@ -41,7 +41,7 @@ public class StringBufferExt {
 		int rv = -1;
 		char[] search_char = search.toCharArray();
 		int found = 0;
-		int end_pos = start_pos + length;
+		int end_pos = length - start_pos;// + length;
 		for( int i=start_pos; i<end_pos; i++ ) {
 			if( buffer[i] == search_char[found] ) {
 				found++;
