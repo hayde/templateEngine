@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import eu.hayde.box.template.Template;
 import eu.hayde.box.template.TemplateException;
-import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,11 +20,7 @@ import javax.script.ScriptException;
  */
 public class Command {
 
-	public String object;
-	public String variable;
 	public String declaration; // for loops (repeats)
-	public String encoding;
-	public String condition;
 	public String codeString;
 	public ScriptEngine interpreter;
 	public Properties languageFile;
@@ -46,20 +41,6 @@ public class Command {
 		}
 
 		codeString = code;
-		//codeString = codeString.replaceAll("\'", "\"").trim();	// the interpreter doesn't allow single quotes
-
-		// object and varible
-		if (!code.contains(".")) {
-			// that is the key
-			object = code.trim();
-		} else {
-			String[] variableSplit = code.split("\\.");
-			if (variableSplit.length > 1) {
-				object = variableSplit[0].trim();
-				variable = code.substring(code.indexOf(".") + 1).trim();
-			}
-		}
-
 	}
 
 	public Object run() throws XMLException {

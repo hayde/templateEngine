@@ -1,5 +1,6 @@
 package eu.hayde.box.template.xml;
 
+import eu.hayde.box.template.util.StringBufferExt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,11 +10,10 @@ import java.util.regex.Pattern;
  */
 public class XMLTagger {
 
-	private StringBuffer xml;
+	private StringBufferExt xml;
 
 	public XMLTagger(String xml) {
-		this.xml = new StringBuffer(xml);
-		this.xml.ensureCapacity(10000);
+		this.xml = new StringBufferExt(xml);
 	}
 
 	public String toString() {
@@ -23,7 +23,7 @@ public class XMLTagger {
 	public String getNextTag(String prefix) {
 		String returnValue = null;
 		Pattern pattern = Pattern.compile("<(\\w+)\\b+[^\\<\\>]((?!hyd:\\w+|[<>]).)*" + prefix + "\\:(\\w+)\\s*=\\s*([^>])*>", Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(xml);
+		Matcher matcher = pattern.matcher(xml.get_charsequence());
 		if (matcher.find()) {
 			returnValue = matcher.group(3);
 		}
@@ -34,7 +34,7 @@ public class XMLTagger {
 		Element returnValue = null;
 		Pattern pattern = Pattern.compile("<(\\w+)\\b+[^\\<\\>]*" + attribute + "\\s*=\\s*(((\"[^\"]*\")|(\'[^\']*\'))[^>]*)>", Pattern.CASE_INSENSITIVE);
 		//Pattern pattern = Pattern.compile("<(\\w+)\\b+[^\\<\\>]*" + attribute + "\\s*=\\s*([^>])*>", Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(xml);
+		Matcher matcher = pattern.matcher(xml.get_charsequence());
 		if (matcher.find()) {
 			Tag tmpOpenTag = new Tag(matcher.group(0), matcher.group(1), matcher.start(), matcher.end());
 			returnValue = _getByOpenTag(tmpOpenTag);
@@ -46,7 +46,7 @@ public class XMLTagger {
 	private Tag _findOpenTag(String tagName, int startPosition) {
 		Tag returnValue = null;
 		Pattern pattern = Pattern.compile("<(" + tagName + ")[^>]*>", Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(xml);
+		Matcher matcher = pattern.matcher(xml.get_charsequence());
 		if (matcher.find(startPosition)) {
 			returnValue = new Tag(matcher.group(0), matcher.group(1), matcher.start(), matcher.end());
 		}
@@ -56,7 +56,7 @@ public class XMLTagger {
 	private Tag _findCloseTag(Tag openTag) throws XMLException {
 		Tag returnValue = null;
 		Pattern pattern = Pattern.compile("</(" + openTag.name + ")\\b*>", Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(xml);
+		Matcher matcher = pattern.matcher(xml.get_charsequence());
 		int startPosition = openTag.end;
 
 		/*
@@ -122,33 +122,6 @@ public class XMLTagger {
 		return returnValue;
 	}
 
-	/*
-	 private Tag _findCloseTag(Tag openTag) {
-	 Pattern pattern = Pattern.compile("</(" + openTag.name + ")\\b*>");
-	 Matcher matcher = pattern.matcher(xml);
-	 int searchStart = openTag.end;
-	 Tag returnValue = null;
-	 while (searchStart > 0) {
-	 // is there an end tag?
-	 if (matcher.find(searchStart)) {
-
-	 // now, we need to check, if there have been other open tags in between
-	 int nextOpenTag = _searchOpenTag(openTag.name, searchStart);
-	 if (nextOpenTag > -1 && nextOpenTag < matcher.start()) {
-	 // search this tags end
-	 Tag tempTag = new Tag(xml, xml, searchStart, nextOpenTag);
-	 tmpTag.searchStart = matcher.end();
-	 } else {
-	 returnValue = new Tag(matcher.group(0), matcher.group(1), matcher.start(), matcher.end());
-	 searchStart = -1;
-	 }
-	 } else {
-	 searchStart = -1;
-	 }
-	 }
-	 return returnValue;
-	 }
-	 */
 	private int _searchOpenTag(String name, int searchStart) {
 		return xml.indexOf("<" + name, searchStart);
 	}
