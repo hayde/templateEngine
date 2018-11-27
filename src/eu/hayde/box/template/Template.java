@@ -35,6 +35,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -47,6 +48,8 @@ import javax.script.ScriptEngineManager;
  * @author can.senturk
  */
 public class Template {
+	
+	private final static String JAVASCRIPT_ENGINE = "ECMAScript";
 
 	private final static String HAYDE_NAMESPACEPREFIX = "hyd";
 	private final static String HAYDE_INCLUDE = "include"; //
@@ -70,8 +73,9 @@ public class Template {
 	private Map<String, Object> dictionary = new HashMap<String, Object>();
 	private boolean preprocessed = false;
 	private ScriptEngine interpreter;
+	private boolean interpreter_self_creation=false; // neccessary to know if the bindings have to be cleared or not.
 	private Bindings binding;
-
+	
 	/**
 	 * initializes the template engine.<br/>
 	 * <br/>
@@ -89,8 +93,8 @@ public class Template {
 	 * contain some further folder information too.
 	 */
 	public Template(String baseDir, String templateFileName) {
-		this.interpreter = new ScriptEngineManager().getEngineByName("nashorn");
-
+		this.interpreter = new ScriptEngineManager().getEngineByName(JAVASCRIPT_ENGINE);
+		this.interpreter_self_creation = true;
 		this.baseDir = baseDir;
 		this.fileName = templateFileName;
 		this.language = "en";
@@ -113,10 +117,11 @@ public class Template {
 	 * @param content
 	 */
 	public Template(String content) {
+		this.interpreter = new ScriptEngineManager().getEngineByExtension("js");//.getEngineByName(JAVASCRIPT_ENGINE);
+		this.interpreter_self_creation = true;
 		this.rawContent = content;
 		this.language = null;
 		this.recursionFlag = false;
-		this.interpreter = new ScriptEngineManager().getEngineByName("nashorn");
 	}
 	
 	public Template(String content, ScriptEngine interpreter) {
@@ -192,7 +197,7 @@ public class Template {
 
 	private void _preprocess() throws XMLException, TemplateException {
 		
-		binding = interpreter.createBindings();
+		binding = interpreter.getBindings(ScriptContext.ENGINE_SCOPE);
 		
 		if (this.rawContent == null) {
 			if (this.fileName != null) {
@@ -223,7 +228,9 @@ public class Template {
 		if (this.languageChanged) {
 			_saveLanguageFile();
 		}
-		binding.clear();
+		if( this.interpreter_self_creation ) {
+			binding.clear();
+		}
 	}
 
 	/**
@@ -258,7 +265,7 @@ public class Template {
 	 * @throws TemplateException
 	 * @throws XMLException 
 	 */
-	public int process() throws TemplateException, XMLException {
+	public synchronized int process() throws TemplateException, XMLException {
 		int actionCount = 0;
 		if (!preprocessed) {
 			_preprocess();
@@ -594,14 +601,14 @@ public class Template {
 
 	private String _parseCode(String parCode) throws XMLException {
 		// code could be like: class.variablename
-		Command code = new Command(interpreter, binding, dictionary, languageFile, parCode);
+		Command code = new Command(interpreter, dictionary, languageFile, parCode);
 
 		return "" + code.run();
 	}
 
 	private String _parseRepeat(Attribute attribute, Element element) throws XMLException, TemplateException {
 		// code could be like: class.variablename
-		Command code = new Command(interpreter, binding, dictionary, languageFile, attribute.value);
+		Command code = new Command(interpreter, dictionary, languageFile, attribute.value);
 
 		return code.repeat(tagger.getTag(element), this.baseDir);
 	}
@@ -613,14 +620,14 @@ public class Template {
 		Attribute returnValue = new Attribute();
 		returnValue.name = parCode.substring(0, parCode.indexOf(":")).trim();
 		returnValue.value = parCode.substring(parCode.indexOf(":") + 1).trim();
-		Command code = new Command(interpreter, binding, dictionary, languageFile, returnValue.value);
+		Command code = new Command(interpreter, dictionary, languageFile, returnValue.value);
 
 		returnValue.value = "" + code.run();
 		return returnValue;
 	}
 
 	private boolean _parseCondition(String parCode) throws XMLException {
-		Command code = new Command(interpreter, binding, dictionary, languageFile, parCode);
+		Command code = new Command(interpreter, dictionary, languageFile, parCode);
 		boolean returnValue = false;
 		Object result = code.run();
 		if (result instanceof Boolean) {

@@ -34,11 +34,9 @@ public class Command {
 	public ScriptEngine interpreter;
 	public Properties languageFile;
 	private Map<String, Object> dictionary;
-	private Bindings binding;
 
-	public Command(ScriptEngine interpreter, Bindings binding, Map<String, Object> dictionary, Properties languageFile, String code) {
+	public Command(ScriptEngine interpreter, Map<String, Object> dictionary, Properties languageFile, String code) {
 		this.interpreter = interpreter;
-		this.binding = binding;
 		this.dictionary = dictionary;
 		this.languageFile = languageFile;
 		Pattern declarationPattern = Pattern.compile("^\\s*([a-zA-Z0-9_]+)\\s*\\:");
@@ -76,7 +74,7 @@ public class Command {
 //			return _getDictionaryValue(codeString);
 //		} else {
 		try {
-			return interpreter.eval(codeString, binding);
+			return interpreter.eval(codeString);
 		} catch (ScriptException ex) {
 			throw new XMLException("Unable to process code of '" + codeString + "': " + ex.getMessage());
 		}

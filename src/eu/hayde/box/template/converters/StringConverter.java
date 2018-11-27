@@ -19,7 +19,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 public class StringConverter {
 
-	private static Locale locale = null;
+	private Locale locale = null;
 
 	public StringConverter(String localeLanguage) {
 		if (localeLanguage == null) {
@@ -28,15 +28,15 @@ public class StringConverter {
 		locale = new Locale(localeLanguage);
 	}
 
-	public static String toUpperCase(String string) {
+	public String toUpperCase(String string) {
 		return string.toUpperCase();
 	}
 
-	public static String toLowerCase(String string) {
+	public String toLowerCase(String string) {
 		return string.toLowerCase();
 	}
 
-	public static String toURL(String string) {
+	public String toURL(String string) {
 		try {
 			return URLEncoder.encode(string, "UTF-8");
 		} catch (UnsupportedEncodingException ex) {
@@ -44,7 +44,7 @@ public class StringConverter {
 		}
 	}
 
-	public static String toHTML(String string) {
+	public String toHTML(String string) {
 		StringBuilder sb = new StringBuilder(string.length());
 		// true if last char was blank
 		boolean lastWasBlankChar = false;
@@ -122,7 +122,7 @@ public class StringConverter {
 	 * @param date to be formated
 	 * @return the String in format "yyyy-MM-dd HH:mm:ss"
 	 */
-	public static String DateToString(Date date) {
+	public String DateToString(Date date) {
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", locale).format(date);
 	}
 
@@ -132,7 +132,7 @@ public class StringConverter {
 	 * @param the string in the format "yyyy-MM-dd HH:mm:ss"
 	 * @return a date
 	 */
-	public static Date StringToDate(String dateString) {
+	public Date StringToDate(String dateString) {
 
 		Date returnValue = null;
 		try {
@@ -152,15 +152,15 @@ public class StringConverter {
 		return returnValue;
 	}
 
-	public static String DateToString(XMLGregorianCalendar date) {
+	public String DateToString(XMLGregorianCalendar date) {
 		return DateToString(date.toGregorianCalendar().getTime());
 	}
 
-	public static String DateToString(Date date, String format) {
+	public String DateToString(Date date, String format) {
 		return new SimpleDateFormat(format, locale).format(date);
 	}
 
-	public static String DateToString(XMLGregorianCalendar date, String format) {
+	public String DateToString(XMLGregorianCalendar date, String format) {
 		if (date == null) {
 			return null;
 		} else {
@@ -168,11 +168,11 @@ public class StringConverter {
 		}
 	}
 
-	public static String DateToString(String date, String format) {
+	public String DateToString(String date, String format) {
 		return DateToString(StringToDate(date), format);
 	}
 
-	public static String NumberToFormat(Double val, String format) {
+	public String NumberToFormat(Double val, String format) {
 		if (val == null) {
 			return null;
 		} else {
@@ -181,15 +181,15 @@ public class StringConverter {
 		}
 	}
 
-	public static String NumberToFormat(Integer val, String format) {
-		return StringConverter.NumberToFormat((double) (val.intValue()), format);
+	public String NumberToFormat(Integer val, String format) {
+		return this.NumberToFormat((double) (val.intValue()), format);
 	}
 
-	public static String NumberToFormat(Long val, String format) {
-		return StringConverter.NumberToFormat((double) (val.longValue()), format);
+	public String NumberToFormat(Long val, String format) {
+		return this.NumberToFormat((double) (val.longValue()), format);
 	}
 
-	public static String Right(String val, Integer endIndex) {
+	public String Right(String val, Integer endIndex) {
 		if (val.length() > endIndex) {
 			return val;
 		} else {
@@ -197,10 +197,10 @@ public class StringConverter {
 		}
 	}
 
-	public static String Left(String val, Integer endIndex) {
+	public String Left(String val, Integer endIndex) {
 		return val.substring(0, endIndex);
 	}
-    public static String LeftSmooth(String val, Integer endIndex) {
+    public String LeftSmooth(String val, Integer endIndex) {
         String returnValue = "";
         if (endIndex > val.length()) {
             returnValue = val;
