@@ -154,6 +154,9 @@ Mr.
 ### hyd:attributes
 this allows to add new attributes to the current tag.
 
+There are some special attributes in a tag, which require no value to them.
+Like "ismap" in img, or "selected" in option
+
 ```
 image_link = "http://www.no.com/image_123.jpg";
 description = "hier is a sample picture to read";
@@ -163,13 +166,13 @@ html_id = null;
 Template:
 
 ```
-<a hyd:attributes="href:image_link; alt:description, id:html_id[noval]"/>
+<a hyd:attributes="href:image_link; alt:description, ismap[noval]:(map_id!==undefined && map_id>-1)"/>
 ```
 
 rendered:
 
 ```
-<a href="http://www.no.com/image_123.jpg" alt="hier is a sample picture to read"/>
+<a href="http://www.no.com/image_123.jpg" alt="hier is a sample picture to read" ismap/>
 
 ```
 

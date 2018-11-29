@@ -198,6 +198,7 @@ public class Template {
 	private void _preprocess() throws XMLException, TemplateException {
 		
 		binding = interpreter.getBindings(ScriptContext.ENGINE_SCOPE);
+		binding.put( "_base_dir", this.baseDir );
 		
 		if (this.rawContent == null) {
 			if (this.fileName != null) {
