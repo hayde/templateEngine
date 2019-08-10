@@ -98,8 +98,11 @@ public class Template {
         this.interpreter = new ScriptEngineManager().getEngineByName(JAVASCRIPT_ENGINE);
         this.interpreter_self_creation = true;
 		this.baseDir = baseDir;
-		this.baseDirWithFileProtocol = this.baseDir;
-		//this.baseDirWithFileProtocol = "file://" + server + this.baseDir;
+		if (this.baseDir.startsWith("file:")) {
+			this.baseDirWithFileProtocol = this.baseDir;
+		} else {
+			this.baseDirWithFileProtocol = "file://" + server + this.baseDir;
+		}
 		this.fileName = templateFileName;
         this.language = "en";
         this.recursionFlag = false;
