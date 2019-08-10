@@ -97,16 +97,14 @@ public class Template {
     public Template ( String server, String baseDir, String templateFileName ) {
         this.interpreter = new ScriptEngineManager().getEngineByName(JAVASCRIPT_ENGINE);
         this.interpreter_self_creation = true;
-        this.baseDir = baseDir;
-        this.baseDirWithFileProtocol = "file://" + server + this.baseDir;
-        this.fileName = templateFileName;
+		this.baseDir = baseDir;
+		this.baseDirWithFileProtocol = this.baseDir;
+		//this.baseDirWithFileProtocol = "file://" + server + this.baseDir;
+		this.fileName = templateFileName;
         this.language = "en";
         this.recursionFlag = false;
-        if (baseDir == null
-                || "".equals(baseDir)) {
-            _stripBaseDirFromFile();
-        }
-    }
+		_stripBaseDirFromFile();
+	}
 
     /**
      * instead of using a file template, you can initialize the template engine
@@ -726,9 +724,13 @@ public class Template {
     }
 
     private void _stripBaseDirFromFile () {
-        this.baseDirWithFileProtocol = this.fileName;
-        this.fileName = new File(this.fileName).getName();
-        this.baseDirWithFileProtocol = this.baseDirWithFileProtocol.substring(0, this.baseDirWithFileProtocol.length() - this.fileName.length());
+		if (this.baseDir == null) {
+			this.baseDirWithFileProtocol = this.fileName;
+			this.fileName = new File(this.fileName).getName();
+			this.baseDirWithFileProtocol = this.baseDirWithFileProtocol.substring(0, this.baseDirWithFileProtocol.length() - this.fileName.length());
+		} else if (this.fileName.startsWith(this.baseDir)) {
+			this.fileName = this.fileName.substring(this.baseDir.length() - 1);
+		}
     }
 
     /**
